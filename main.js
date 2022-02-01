@@ -15,16 +15,20 @@ function init(){
    renderer.setSize(window.innerWidth, window.innerHeight)
 
    //Add objetos geométricos
-   const box = getBox(1, 5, 1)
+   const box = getBox(1, 1, 1)
    const plane = getPlane(4, 4)
+   plane.name = 'plane-1' //Podemos nomear nossos objetos, facilitando sua localização através getObjectByName pelo objeto pai (neste caso, o pai de 'plane' é 'scene'). Retorno o primeiro objeto que deu match no nome.
    plane.rotation.x = Math.PI / 2 //THREE.js usa radianos ao invés de graus
-   box.position.y = box.geometry.parameters.height / 2 //O box ficará em cima do plano
+   plane.position.y = 1
+   box.position.y = box.geometry.parameters.height / 2 //O box ficará em cima do plano (não mais se adicionarmos o 'box' como filho de 'plane' e mudarmos a posição y de plane -> plane.position.y = 1)
 
-   scene.add(box)
+   plane.add(box) //box é filho de plane
    scene.add(plane)
 
    document.getElementById('root').appendChild(renderer.domElement)
-   renderer.render(scene, camera)
+   update(renderer, camera, scene)
+
+   return scene
 }
 
 function getBox(w, h, d){
@@ -43,4 +47,22 @@ function getPlane(w, h){
    return mesh
 }
 
-init()
+function update(renderer, camera, scene){
+   renderer.render(scene, camera)
+
+   const myPlane = scene.getObjectByName('plane-1')
+   myPlane.rotation.y += 0.001
+   myPlane.rotation.z += 0.001
+
+   //Função callback, irá percorrer por todos os objetos filho e executar uma determinada ação. Neste caso, o único filho de 'scene' é o 'plane', que por sua vez é pai de 'box'
+   scene.traverse(function(child){
+      child.scale.x += 0.001
+   })
+
+   //requestAnimationFrame é um método do objeto window
+   requestAnimationFrame(function(){ //Chamando o método update de forma recursiva
+      update(renderer, camera, scene)
+   })
+}
+
+var scene = init()
