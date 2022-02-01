@@ -3,6 +3,9 @@ import * as THREE from 'https://cdn.skypack.dev/three@0.137.5'
 function init(){
    const scene = new THREE.Scene()
 
+   //Fog
+   scene.fog = new THREE.FogExp2(0xffffff, 0.2)
+
    const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000)
 
    //mMdando a posição da câmera
@@ -13,16 +16,18 @@ function init(){
 
    const renderer = new THREE.WebGLRenderer()
    renderer.setSize(window.innerWidth, window.innerHeight)
+   renderer.setClearColor(0xffffff) //background color
 
    //Add objetos geométricos
    const box = getBox(1, 1, 1)
    const plane = getPlane(4, 4)
-   plane.name = 'plane-1' //Podemos nomear nossos objetos, facilitando sua localização através getObjectByName pelo objeto pai (neste caso, o pai de 'plane' é 'scene'). Retorno o primeiro objeto que deu match no nome.
+   //plane.name = 'plane-1' //Podemos nomear nossos objetos, facilitando sua localização através getObjectByName pelo objeto pai (neste caso, o pai de 'plane' é 'scene'). Retorno o primeiro objeto que deu match no nome.
    plane.rotation.x = Math.PI / 2 //THREE.js usa radianos ao invés de graus
-   plane.position.y = 1
+   //plane.position.y = 1
    box.position.y = box.geometry.parameters.height / 2 //O box ficará em cima do plano (não mais se adicionarmos o 'box' como filho de 'plane' e mudarmos a posição y de plane -> plane.position.y = 1)
 
-   plane.add(box) //box é filho de plane
+   //plane.add(box) //box é filho de plane
+   scene.add(box)
    scene.add(plane)
 
    document.getElementById('root').appendChild(renderer.domElement)
@@ -50,14 +55,14 @@ function getPlane(w, h){
 function update(renderer, camera, scene){
    renderer.render(scene, camera)
 
-   const myPlane = scene.getObjectByName('plane-1')
-   myPlane.rotation.y += 0.001
-   myPlane.rotation.z += 0.001
+   // const myPlane = scene.getObjectByName('plane-1')
+   // myPlane.rotation.y += 0.001
+   // myPlane.rotation.z += 0.001
 
    //Função callback, irá percorrer por todos os objetos filho e executar uma determinada ação. Neste caso, o único filho de 'scene' é o 'plane', que por sua vez é pai de 'box'
-   scene.traverse(function(child){
-      child.scale.x += 0.001
-   })
+   // scene.traverse(function(child){
+   //    child.scale.x += 0.001
+   // })
 
    //requestAnimationFrame é um método do objeto window
    requestAnimationFrame(function(){ //Chamando o método update de forma recursiva
